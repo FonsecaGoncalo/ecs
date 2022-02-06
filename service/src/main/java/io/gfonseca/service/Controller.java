@@ -11,6 +11,6 @@ public class Controller {
 
     @GetMapping("/healthcheck")
     public String healthcheck() {
-        return "{ \"status\": \"healthy\"}";
+        return "{ \"status\": \"healthy\" }";
     }
 }
