@@ -9,7 +9,7 @@ variable "aws_region" {
 
 variable "stack" {
   description = "Name of the stack."
-  default     = "GameDay"
+  default     = "ecs-cluster"
 }
 
 variable "vpc_cidr" {
@@ -24,11 +24,13 @@ variable "az_count" {
 
 variable "aws_ecr" {
   description = "AWS ECR "
+  default     = "ecs-poc-service"
 }
 
 variable "image_repo_name" {
   description = "Image repo name"
-  type = string
+  type        = string
+  default     = "ecs-poc-service-repo"
 }
 
 
