@@ -5,7 +5,7 @@
 terraform {
   required_version = "v1.1.3"
   backend "s3" {
-    key = "ecs-cluster/state.tf"
+    key = "ecs-cluster/terraform.tfstate"
     region = "eu-west-3"
   }
   required_providers {

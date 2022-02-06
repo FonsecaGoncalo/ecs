@@ -6,7 +6,7 @@ terraform {
   required_version = "1.1.3"
   backend "s3" {
     region = "eu-west-3"
-    key = "ecs-service/service.tf"
+    key = "ecs-service/terraform.tfstate"
   }
   required_providers {
     aws = {

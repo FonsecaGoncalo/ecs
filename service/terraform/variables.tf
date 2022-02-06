@@ -9,11 +9,12 @@ variable "aws_region" {
 
 variable "aws_profile" {
   description = "AWS profile"
+  default     = "default"
 }
 
 variable "stack" {
   description = "Name of the stack."
-  default     = "ecs-poc"
+  default     = "service-poc"
 }
 
 variable "vpc_cidr" {
