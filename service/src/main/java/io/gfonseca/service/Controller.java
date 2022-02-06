@@ -17,7 +17,7 @@ public class Controller {
         return Collections.singletonMap("status", "healthy");
     }
 
-    @GetMapping("envvars")
+    @GetMapping("env-vars")
     public Map<String, String> envVars() {
         return System.getenv();
     }
