@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# AWS PROVIDER FOR TF CLOUD
+# ---------------------------------------------------------------------------------------------------------------------
+
+terraform {
+  required_version = "1.1.3"
+  backend "s3" {
+    region = "eu-west-3"
+    key = "ecs-service/service.tf"
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.74.0"
+    }
+  }
+}
+
+provider "aws" {
+  region  = var.aws_region
+  profile = var.aws_profile
+}
