@@ -3,6 +3,9 @@ package io.gfonseca.service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+import java.util.Map;
+
 @RestController
 public class Controller {
 
@@ -10,7 +13,12 @@ public class Controller {
     }
 
     @GetMapping("/healthcheck")
-    public String healthcheck() {
-        return "{ \"status\": \"healthy\" }";
+    public Map<String, String> healthcheck() {
+        return Collections.singletonMap("status", "healthy");
+    }
+
+    @GetMapping("envvars")
+    public Map<String, String> envVars() {
+        return System.getenv();
     }
 }
