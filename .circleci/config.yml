@@ -49,19 +49,21 @@ commands:
 
 jobs:
   get-aws-account:
+    working_directory: *workspace_root
     docker:
       - image: amazon/aws-cli
     steps:
       - run:
-          command: echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
+          command: echo "$(aws sts get-caller-identity --query Account --output text)" > account_id
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
       - image: hashicorp/terraform:1.1.5
     steps:
+      - *attach_workspace
       - checkout
       - terraform-init:
-          account-id: $(AWS_ACCOUNT_ID)
+          account-id: $(cat account_id)
           dir: ./ecs-cluster/terraform
       - terraform-apply:
           dir: ./ecs-cluster/terraform
@@ -81,7 +83,7 @@ jobs:
       - run:
           name: build and push docker image
           command: |
-            account_id = $(AWS_ACCOUNT_ID)
+            account_id = $(cat account_id)
             tag = $(echo $CIRCLE_SHA1 | cut -c 1-7)
             repository = $(cat image_repo_name)
             ./service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
@@ -95,7 +97,7 @@ jobs:
           name: ECS-Service terraform init & apply
           command: |
       - terraform-init:
-          account-id: $(AWS_ACCOUNT_ID)
+          account-id: $(cat account_id)
           dir: ./service/terraform
       - terraform-apply:
           dir: ./service/terraform
