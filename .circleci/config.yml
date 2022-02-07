@@ -102,11 +102,11 @@ jobs:
   build-push-docker-image:
     working_directory: *workspace_root
     docker:
-      - image: docker:20.10.12-dind-alpine3.15
+      - image: docker:20.10.11
     steps:
       - *attach_workspace
       - setup_remote_docker
-          version: 20.10.12
+          version: 20.10.11
       - run:
           name: build and push docker image
           command: |
