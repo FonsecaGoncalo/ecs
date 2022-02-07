@@ -39,10 +39,6 @@ commands:
 
 jobs:
   ecs-cluster-terraform:
-    filters:
-      branches:
-        only:
-          - main
     working_directory: *workspace_root
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
