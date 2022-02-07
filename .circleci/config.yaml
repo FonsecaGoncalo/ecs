@@ -2,36 +2,72 @@ version: 2
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
 
+references:
+  workspace_root: &workspace_root
+                    /tmp/workspace
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+  persist_to_worksapce: &persist_to_workspace
+    persist_to_worksapce:
+      root: .
+        paths:
+          - .
+
+commands:
+  terraform-init:
+    description: "terraform init"
+    parameters:
+      account-id:
+        description: "AWS Account ID"
+        type: string
+    steps:
+      - run:
+          name: terraform init
+          command: terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
+  terraform-apply:
+    description: "terraform Apply"
+    parameters:
+      vars:
+        description: "Terraform vars"
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: terraform apply
+          command: terraform apply -auto-approve -var="<< parameters.vars >>"
+
 jobs:
   ecs-cluster-terraform:
     filters:
       branches:
         only:
           - main
-    working_directory: /tmp/project
+    working_directory: *workspace_root
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
       - run:
           name: ECS-CLUSTER terraform init & apply
-          command: |
+          command:
             account_id = $(aws sts get-caller-identity --query Account --output text)
             cd ./ecs-cluster/terraform
-            terraform init -input=false -backend-config="bucket=${account_id}-tfstate"
-            terraform apply -auto-approve
+      - terraform-init:
+          account-id: $(aws sts get-caller-identity --query Account --output text)
+      - terraform-apply
+      - run:
+          name: get terraform outputs
+          command: |
+            terraform output image_repo_name > ../../image_repo_name
+            terraform output image_repo_url > ../..image_repo_url
             cd ../..
-            terraform output image_repo_name > image_repo_name
-            terraform output image_repo_url > image_repo_url
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - *persist_to_workspace
   build-push-docker-image:
-    - attach_workspace:
-        at: .
     docker:
       - image: amazon/aws-cli
+    steps:
+      - *attach_workspace
       - run:
           name: build and push docker image
           command: |
@@ -39,29 +75,22 @@ jobs:
             tag = $(echo $CIRCLE_SHA1 | cut -c 1-7)
             repository = $(cat image_repo_name)
             ./service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - *persist_to_workspace
   ecs-service-terraform:
     - attach_workspace:
         at: .
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
+      - *attach_workspace
       - run:
           name: ECS-Service terraform init & apply
           command: |
-            account_id = $(aws sts get-caller-identity --query Account --output text)
             cd ./service/terraform
-            terraform init -input=false -backend-config="bucket=${account_id}-tfstate"
-            terraform apply -auto-approve -var="service_image_url=$(cat image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)"
-            cd ../..
-            terraform output image_repo_url > image_repo_url
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - terraform-init:
+          account-id: $(aws sts get-caller-identity --query Account --output text)
+      - terraform-apply:
+          vars: service_image_url=$(cat image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
   plan_approve_apply:
