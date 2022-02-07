@@ -34,16 +34,22 @@ commands:
       vars:
         description: "Terraform vars"
         type: string
-        default: ""
       dir:
         description: "Directory to run the command in"
         type: string
     steps:
       - run:
-          name: terraform apply
           command: |
             cd << parameters.dir >>
             terraform apply -auto-approve -var="<< parameters.vars >>"
+          when:
+            condition: << parameters.vars >>
+      - run:
+          command: |
+            cd << parameters.dir >>
+            terraform apply -auto-approve
+          unless:
+            condition: << parameters.vars >>
   install-tar:
     steps:
       - run:
