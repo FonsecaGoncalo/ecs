@@ -11,8 +11,8 @@ references:
   persist_to_worksapce: &persist_to_workspace
     persist_to_worksapce:
       root: .
-        paths:
-          - .
+      paths:
+        - .
 
 commands:
   terraform-init:
