@@ -38,6 +38,13 @@ commands:
           command: terraform apply -auto-approve -var="<< parameters.vars >>"
 
 jobs:
+  get-aws-account:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - run:
+          command:|
+        echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
@@ -49,7 +56,7 @@ jobs:
           command:
             cd ./ecs-cluster/terraform
       - terraform-init:
-          account-id: $(aws sts get-caller-identity --query Account --output text)
+          account-id: $(AWS_ACCOUNT_ID)
       - terraform-apply
       - run:
           name: get terraform outputs
@@ -66,7 +73,7 @@ jobs:
       - run:
           name: build and push docker image
           command: |
-            account_id = $(aws sts get-caller-identity --query Account --output text)
+            account_id = $(AWS_ACCOUNT_ID)
             tag = $(echo $CIRCLE_SHA1 | cut -c 1-7)
             repository = $(cat image_repo_name)
             ./service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
@@ -81,13 +88,14 @@ jobs:
           command: |
             cd ./service/terraform
       - terraform-init:
-          account-id: $(aws sts get-caller-identity --query Account --output text)
+          account-id: $(AWS_ACCOUNT_ID)
       - terraform-apply:
           vars: service_image_url=$(cat image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
   plan_approve_apply:
     jobs:
+      - get-aws-account
       - ecs-cluster-terraform
       - build-push-docker-image:
           requires:
