@@ -23,7 +23,7 @@ commands:
         type: string
     steps:
       - run:
-          name: terraform init
+          name: Terraform Init
           command: |
             export ACCOUNT_ID=$(cat account_id)
             cd << parameters.dir >>
@@ -40,6 +40,7 @@ commands:
         type: string
     steps:
       - run:
+          name: Terraform Apply
           command: |
             cd << parameters.dir >>
             if [ -z "<< parameters.vars >>" ]
@@ -89,8 +90,8 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - *attach_workspace
       - install-tar
+      - *attach_workspace
       - run:
           name: build and push docker image
           command: |
