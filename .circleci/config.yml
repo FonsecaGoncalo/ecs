@@ -25,7 +25,7 @@ commands:
       - run:
           name: Terraform Init
           command: |
-            export ACCOUNT_ID=$(cat /tmp/vars/account_id)
+            export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
             cd << parameters.dir >>
             terraform init -input=false -backend-config="bucket=${ACCOUNT_ID}-tfstate"
   terraform-apply:
@@ -64,7 +64,7 @@ jobs:
     steps:
       - install-tar
       - run:
-          command: echo "$(aws sts get-caller-identity --query Account --output text)" > /tmp/vars/account_id
+          command: echo "$(aws sts get-caller-identity --query Account --output text)" > /tmp/workspace/vars/account_id
       - *persist_to_workspace
   ecs-cluster-terraform:
     working_directory: *workspace_root
@@ -82,8 +82,8 @@ jobs:
           name: get terraform outputs
           command: |
             cd ./src/ecs-cluster/terraform
-            terraform output image_repo_name > /tmp/vars/image_repo_name
-            terraform output image_repo_url > /tmp/vars/image_repo_url
+            terraform output image_repo_name > /tmp/workspace/vars/image_repo_name
+            terraform output image_repo_url > /tmp/workspace/vars/image_repo_url
             cd ../..
       - *persist_to_workspace
   build-push-docker-image:
@@ -95,9 +95,9 @@ jobs:
       - run:
           name: build and push docker image
           command: |
-            account_id = $(cat /tmp/vars/account_id)
+            account_id = $(cat /tmp/workspace/vars/account_id)
             tag = $(echo $CIRCLE_SHA1 | cut -c 1-7)
-            repository = $(cat /tmp/vars/image_repo_name)
+            repository = $(cat /tmp/workspace/vars/image_repo_name)
             ./src/service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
       - *persist_to_workspace
   ecs-service-terraform:
@@ -112,7 +112,7 @@ jobs:
           dir: ./src/service/terraform
       - terraform-apply:
           dir: ./src/service/terraform
-          vars: service_image_url=$(cat /tmp/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
+          vars: service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
   plan_approve_apply:
