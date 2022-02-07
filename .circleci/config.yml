@@ -21,15 +21,13 @@ commands:
       dir:
         description: "Directory to run the command in"
         type: string
-      account-id:
-        description: "AWS Account ID"
-        type: string
     steps:
       - run:
           name: terraform init
           command: |
+            account_id = $(cat account_id)
             cd << parameters.dir >>
-            terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
+            terraform init -input=false -backend-config="bucket=${account_id}-tfstate"
   terraform-apply:
     description: "terraform Apply"
     parameters:
@@ -63,7 +61,6 @@ jobs:
       - *attach_workspace
       - checkout
       - terraform-init:
-          account-id: $(cat account_id)
           dir: ./ecs-cluster/terraform
       - terraform-apply:
           dir: ./ecs-cluster/terraform
