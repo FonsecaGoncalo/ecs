@@ -60,16 +60,15 @@ jobs:
       - image: hashicorp/terraform:1.1.5
     steps:
       - checkout
-      - run:
-          name: ECS-CLUSTER terraform init & apply
-          command:
-            cd ./ecs-cluster/terraform
       - terraform-init:
           account-id: $(AWS_ACCOUNT_ID)
-      - terraform-apply
+          dir: ./ecs-cluster/terraform
+      - terraform-apply:
+          dir: ./ecs-cluster/terraform
       - run:
           name: get terraform outputs
           command: |
+            cd ./ecs-cluster/terraform
             terraform output image_repo_name > ../../image_repo_name
             terraform output image_repo_url > ../..image_repo_url
             cd ../..
@@ -95,10 +94,11 @@ jobs:
       - run:
           name: ECS-Service terraform init & apply
           command: |
-            cd ./service/terraform
       - terraform-init:
           account-id: $(AWS_ACCOUNT_ID)
+          dir: ./service/terraform
       - terraform-apply:
+          dir: ./service/terraform
           vars: service_image_url=$(cat image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
