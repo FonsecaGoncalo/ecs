@@ -8,22 +8,20 @@ resource "aws_ecs_task_definition" "task-def" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu
   memory                   = var.fargate_memory
-  //task_role_arn            = "${aws_iam_role.ecs-tasks-service-role.arn}"
   execution_role_arn       = aws_iam_role.tasks-service-role.arn
   container_definitions    = jsonencode([
     {
       cpu         = var.fargate_cpu
-      #      image            = data.terraform_remote_state.ecs.outputs.aws_ecr_repository.image_repo.repository_url
-      image       = "433743481407.dkr.ecr.eu-west-3.amazonaws.com/ecs-poc-service-repo:2"
+      image       = var.service_image_url
       memory      = var.fargate_memory
       name        = var.family
       networkMode = "awsvpc"
       healthCheck = {
         command     = ["CMD-SHELL", "curl -f http://localhost/8080/healthcheck || exit 1"],
-        interval    = 30
-        retries     = 3
-        startPeriod = 30
-        timeout     = 10
+        interval    = var.health_check_interval
+        retries     = var.health_check_retries
+        startPeriod = var.health_check_start_period
+        timeout     = var.health_check_timeout
       }
       logConfiguration = {
         logDriver = "awslogs"
@@ -33,12 +31,12 @@ resource "aws_ecs_task_definition" "task-def" {
           awslogs-stream-prefix = var.cw_log_stream
         }
       }
-      ##      environment = [
-      ##        {
-      ##          name  = "spring.profiles.active"
-      ##          value = var.spring_profile
-      ##        }
-      #      ]
+      environment = [
+        {
+          name  = "spring.profiles.active"
+          value = var.spring_profile
+        }
+            ]
       portMappings = [
         {
           containerPort = var.container_port
@@ -59,8 +57,8 @@ resource "aws_ecs_service" "service" {
   task_definition                    = aws_ecs_task_definition.task-def.arn
   desired_count                      = var.task_count
   launch_type                        = "FARGATE"
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+  deployment_maximum_percent         = var.deployment_maximum_percent
 
   network_configuration {
     security_groups = [aws_security_group.task-sg.id]
@@ -82,6 +80,6 @@ resource "aws_ecs_service" "service" {
 # CLOUDWATCH LOG GROUP
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "aws_cloudwatch_log_group" "petclinic-cw-lgrp" {
+resource "aws_cloudwatch_log_group" "service-cw-lgrp" {
   name = var.cw_log_group
 }

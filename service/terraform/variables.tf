@@ -53,7 +53,7 @@ variable "fargate_memory" {
 }
 
 variable "fargate-task-service-role" {
-  description = "Name of the stack."
+  description = "Name of the stack"
   default     = "ecs-poc"
 }
 
@@ -70,4 +70,38 @@ variable "cw_log_stream" {
 variable "spring_profile" {
   description = "Active Spring Profile"
   default     = "default"
+}
+
+variable "service_image_url" {
+  description = "Image url to be used in the task definition"
+}
+
+variable "deployment_minimum_healthy_percent" {
+  description = "Lower limit of the number of running tasks that must remain running and healthy in a service during a deployment."
+  default     = 50
+}
+
+variable "deployment_maximum_percent" {
+  description = "Upper limit of the number of running tasks that can be running in a service during a deployment"
+  default     = 100
+}
+
+variable "health_check_interval" {
+  description = "The time period in seconds between each health check execution"
+  default     = 30
+}
+
+variable "health_check_retries" {
+  description = "The number of times to retry a failed health check before the container is considered unhealthy"
+  default     = 3
+}
+
+variable "health_check_start_period" {
+  description = "The grace period in seconds to provide containers time to bootstrap before failed health checks"
+  default     = 30
+}
+
+variable "health_check_timeout" {
+  description = "The time period in seconds to wait for a health check to succeed before it is considered a failure"
+  default     = 10
 }

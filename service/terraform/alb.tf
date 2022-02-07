@@ -36,6 +36,7 @@ resource "aws_alb_listener" "alb-listener" {
   }
 }
 
+## Outputs
 output "alb_address" {
   value = aws_alb.alb.dns_name
 }
