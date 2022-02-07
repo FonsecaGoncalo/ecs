@@ -87,23 +87,34 @@ jobs:
             terraform output --raw image_repo_name > /tmp/workspace/vars/image_repo_name
             terraform output --raw image_repo_url > /tmp/workspace/vars/image_repo_url
       - *persist_to_workspace
-  build-push-docker-image:
+  get-ecr-login:
     working_directory: *workspace_root
     docker:
       - image: amazon/aws-cli:2.4.16
     steps:
       - install-tar
       - *attach_workspace
-      - setup_remote_docker:
-          version: 19.03.13
       - run:
-          name: Build & Push Image
+          name: Get ECR login
+          command: |
+            aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" > /tmp/workspace/vars/ecr_login
+      - *persist_to_workspace
+  build-push-docker-image:
+    working_directory: *workspace_root
+    docker:
+      - image: docker:20.10.12-dind-alpine3.15
+    steps:
+      - *attach_workspace
+      - setup_remote_docker
+          version: 20.10.12
+      - run:
+          name: build and push docker image
           command: |
             export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
             export TAG=$(echo $CIRCLE_SHA1 | cut -c 1-7)
             export REPOSITORY=$(cat /tmp/workspace/vars/image_repo_name)
             cd ./src/service
-            aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
+            cat /tmp/workspace/vars/ecr_login | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
             docker build --platform linux/amd64 -t "${REPOSITORY}" .
             docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
             docker push "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
@@ -129,9 +140,12 @@ workflows:
       - ecs-cluster-terraform:
           requires:
             - get-aws-account
-      - build-push-docker-image:
+      - get-ecr-login:
           requires:
             - ecs-cluster-terraform
+      - build-push-docker-image:
+          requires:
+            - get-ecr-login
       - ecs-service-terraform:
           requires:
             - build-push-docker-image
