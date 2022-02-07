@@ -43,8 +43,8 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - run:
-          command:|
-        echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
+          command:  |
+            echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
