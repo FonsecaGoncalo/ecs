@@ -102,7 +102,7 @@ jobs:
   build-push-docker-image:
     working_directory: *workspace_root
     docker:
-      - image: amazon/aws-cli
+      - image: docker:20.10.12-dind-alpine3.15
     steps:
       - install-tar
       - *attach_workspace
@@ -116,7 +116,7 @@ jobs:
             cat /tmp/workspace/vars/ecr_login | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
             docker build --platform linux/amd64 -t "${REPOSITORY}" .
             docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
-            docker push "${IMAGE_URL}"
+            docker push "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
