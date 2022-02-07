@@ -26,6 +26,9 @@ commands:
           name: Terraform Init
           command: |
             export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
+            ls
+            ls ./src
+            ls ./src/service
             cd << parameters.dir >>
             terraform init -input=false -backend-config="bucket=${ACCOUNT_ID}-tfstate"
   terraform-apply:
