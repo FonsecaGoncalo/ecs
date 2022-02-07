@@ -129,7 +129,7 @@ jobs:
           dir: ./src/service/terraform
       - terraform-apply:
           dir: ./src/service/terraform
-          vars: -var="service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)" -var="$(cat /tmp/workspace/vars/account_id)-tfstate"
+          vars: -var="service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)" -var="ecs_cluster_state_bucket=$(cat /tmp/workspace/vars/account_id)-tfstate"
 workflows:
   version: 2
   build:
