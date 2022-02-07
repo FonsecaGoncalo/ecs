@@ -96,7 +96,9 @@ workflows:
   plan_approve_apply:
     jobs:
       - get-aws-account
-      - ecs-cluster-terraform
+      - ecs-cluster-terraform:
+          requires:
+            - get-aws-account
       - build-push-docker-image:
           requires:
             - ecs-cluster-terraform
