@@ -105,7 +105,7 @@ jobs:
       - image: docker:20.10.11
     steps:
       - *attach_workspace
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 20.10.11
       - run:
           name: build and push docker image
