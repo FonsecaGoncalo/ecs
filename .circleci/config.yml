@@ -77,8 +77,6 @@ jobs:
             ./service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
       - *persist_to_workspace
   ecs-service-terraform:
-    - attach_workspace:
-        at: .
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
