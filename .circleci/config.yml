@@ -18,13 +18,18 @@ commands:
   terraform-init:
     description: "terraform init"
     parameters:
+      dir:
+        description: "Directory to run the command in"
+        type: string
       account-id:
         description: "AWS Account ID"
         type: string
     steps:
       - run:
           name: terraform init
-          command: terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
+          command: |
+          cd << parameters.dir >>
+          terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
   terraform-apply:
     description: "terraform Apply"
     parameters:
@@ -32,10 +37,15 @@ commands:
         description: "Terraform vars"
         type: string
         default: ""
+      dir:
+        description: "Directory to run the command in"
+        type: string
     steps:
       - run:
           name: terraform apply
-          command: terraform apply -auto-approve -var="<< parameters.vars >>"
+          command: |
+          cd << parameters.dir >>
+          terraform apply -auto-approve -var="<< parameters.vars >>"
 
 jobs:
   get-aws-account:
