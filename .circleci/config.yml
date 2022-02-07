@@ -27,7 +27,7 @@ commands:
     steps:
       - run:
           name: terraform init
-          command:  |
+          command: |
           cd << parameters.dir >>
           terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
   terraform-apply:
@@ -43,7 +43,7 @@ commands:
     steps:
       - run:
           name: terraform apply
-          command:  |
+          command: |
           cd << parameters.dir >>
           terraform apply -auto-approve -var="<< parameters.vars >>"
 
@@ -53,7 +53,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - run:
-          command:  echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
+          command: echo "export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $BASH_ENV
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
