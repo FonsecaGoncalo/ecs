@@ -64,6 +64,8 @@ jobs:
     steps:
       - install-tar
       - run:
+          command: mkdir .vars
+      - run:
           command: echo "$(aws sts get-caller-identity --query Account --output text)" > /tmp/workspace/vars/account_id
       - *persist_to_workspace
   ecs-cluster-terraform:
