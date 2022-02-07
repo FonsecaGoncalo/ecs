@@ -8,8 +8,8 @@ references:
   attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
-  persist_to_worksapce: &persist_to_workspace
-    persist_to_worksapce:
+  persist_to_workspace: &persist_to_workspace
+    persist_to_workspace:
       root: .
       paths:
         - .
