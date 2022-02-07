@@ -64,7 +64,7 @@ jobs:
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
-      - image: hashicorp/terraform:1.1.5
+      - image: hashicorp/terraform:1.1.3
     steps:
       - *attach_workspace
       - checkout:
@@ -97,7 +97,7 @@ jobs:
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
-      - image: hashicorp/terraform:1.1.5
+      - image: hashicorp/terraform:1.1.3
     steps:
       - *attach_workspace
       - run:
