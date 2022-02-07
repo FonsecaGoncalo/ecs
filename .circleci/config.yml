@@ -97,6 +97,6 @@ workflows:
       - build-push-docker-image:
           requires:
             - ecs-cluster-terraform
-      - build-push-docker-image:
+      - ecs-service-terraform:
           requires:
             - build-push-docker-image
