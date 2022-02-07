@@ -94,7 +94,7 @@ jobs:
     steps:
       - install-tar
       - *attach_workspace
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 19.03.13
       - run:
           name: Build & Push Image
