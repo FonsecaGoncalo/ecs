@@ -88,6 +88,7 @@ jobs:
             terraform output image_repo_url > /tmp/workspace/vars/image_repo_url
       - *persist_to_workspace
   build-push-docker-image:
+    working_directory: *workspace_root
     docker:
       - image: amazon/aws-cli
     steps:
