@@ -90,7 +90,7 @@ jobs:
   get-ecr-login:
     working_directory: *workspace_root
     docker:
-      - image: amazon/aws-cli
+      - image: amazon/aws-cli:2.4.16
     steps:
       - install-tar
       - *attach_workspace
@@ -104,7 +104,6 @@ jobs:
     docker:
       - image: docker:20.10.12-dind-alpine3.15
     steps:
-      - install-tar
       - *attach_workspace
       - run:
           name: build and push docker image
