@@ -41,13 +41,12 @@ jobs:
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: hashicorp/terraform:1.1.5
     steps:
       - checkout
       - run:
           name: ECS-CLUSTER terraform init & apply
           command:
-            account_id = $(aws sts get-caller-identity --query Account --output text)
             cd ./ecs-cluster/terraform
       - terraform-init:
           account-id: $(aws sts get-caller-identity --query Account --output text)
@@ -74,7 +73,7 @@ jobs:
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: hashicorp/terraform:1.1.5
     steps:
       - *attach_workspace
       - run:
