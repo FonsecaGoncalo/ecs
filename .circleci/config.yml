@@ -28,8 +28,8 @@ commands:
       - run:
           name: terraform init
           command: |
-          cd << parameters.dir >>
-          terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
+            cd << parameters.dir >>
+            terraform init -input=false -backend-config="bucket=<< parameters.account-id >>-tfstate"
   terraform-apply:
     description: "terraform Apply"
     parameters:
@@ -44,8 +44,8 @@ commands:
       - run:
           name: terraform apply
           command: |
-          cd << parameters.dir >>
-          terraform apply -auto-approve -var="<< parameters.vars >>"
+            cd << parameters.dir >>
+            terraform apply -auto-approve -var="<< parameters.vars >>"
 
 jobs:
   get-aws-account:
