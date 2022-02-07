@@ -67,7 +67,7 @@ jobs:
       - image: hashicorp/terraform:1.1.5
     steps:
       - *attach_workspace
-      - checkout
+      - checkout:
         path: ./src
       - terraform-init:
           dir: ./src/ecs-cluster/terraform
