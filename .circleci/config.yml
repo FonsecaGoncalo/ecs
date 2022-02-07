@@ -68,7 +68,7 @@ jobs:
     steps:
       - *attach_workspace
       - checkout:
-        path: ./src
+          path: ./src
       - terraform-init:
           dir: ./src/ecs-cluster/terraform
       - terraform-apply:
