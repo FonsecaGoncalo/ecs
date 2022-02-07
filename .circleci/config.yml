@@ -108,7 +108,7 @@ jobs:
       - setup_remote_docker:
           version: 20.10.11
       - run:
-          name: build and push docker image
+          name: build and Push Docker Image
           command: |
             export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
             export TAG=$(echo $CIRCLE_SHA1 | cut -c 1-7)
@@ -116,8 +116,8 @@ jobs:
             cd ./src/service
             cat /tmp/workspace/vars/ecr_login | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
             docker build --platform linux/amd64 -t "${REPOSITORY}" .
-            docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
-            docker push "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
+            docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${TAG}"
+            docker push "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${TAG}"
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
