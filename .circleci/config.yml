@@ -53,8 +53,8 @@ jobs:
           command:
             account_id = $(aws sts get-caller-identity --query Account --output text)
             cd ./ecs-cluster/terraform
-      - terraform-init:
-          account-id: $(aws sts get-caller-identity --query Account --output text)
+      - terraform-init
+#          account-id: $(aws sts get-caller-identity --query Account --output text)
       - terraform-apply
       - run:
           name: get terraform outputs
