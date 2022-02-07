@@ -34,6 +34,7 @@ commands:
       vars:
         description: "Terraform vars"
         type: string
+        default: ""
       dir:
         description: "Directory to run the command in"
         type: string
