@@ -68,16 +68,17 @@ jobs:
     steps:
       - *attach_workspace
       - checkout
+        path: ./src
       - terraform-init:
-          dir: ./ecs-cluster/terraform
+          dir: ./src/ecs-cluster/terraform
       - terraform-apply:
-          dir: ./ecs-cluster/terraform
+          dir: ./src/ecs-cluster/terraform
       - run:
           name: get terraform outputs
           command: |
-            cd ./ecs-cluster/terraform
-            terraform output image_repo_name > ../../image_repo_name
-            terraform output image_repo_url > ../..image_repo_url
+            cd ./src/ecs-cluster/terraform
+            terraform output image_repo_name > ../../../image_repo_name
+            terraform output image_repo_url > ../../..image_repo_url
             cd ../..
       - *persist_to_workspace
   build-push-docker-image:
@@ -92,7 +93,7 @@ jobs:
             account_id = $(cat account_id)
             tag = $(echo $CIRCLE_SHA1 | cut -c 1-7)
             repository = $(cat image_repo_name)
-            ./service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
+            ./src/service/push_image "${account_id}" "${AWS_DEFAULT_REGION}" "${repository}" "${tag}"
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
@@ -103,9 +104,9 @@ jobs:
           name: ECS-Service terraform init & apply
           command: |
       - terraform-init:
-          dir: ./service/terraform
+          dir: ./src/service/terraform
       - terraform-apply:
-          dir: ./service/terraform
+          dir: ./src/service/terraform
           vars: service_image_url=$(cat image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
