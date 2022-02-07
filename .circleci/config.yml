@@ -10,7 +10,7 @@ references:
       at: *workspace_root
   persist_to_workspace: &persist_to_workspace
     persist_to_workspace:
-      root: .
+      root: &workspace_root
       paths:
         - .
 
@@ -86,7 +86,6 @@ jobs:
             cd ./src/ecs-cluster/terraform
             terraform output image_repo_name > /tmp/workspace/vars/image_repo_name
             terraform output image_repo_url > /tmp/workspace/vars/image_repo_url
-            cd ../..
       - *persist_to_workspace
   build-push-docker-image:
     docker:
@@ -100,7 +99,7 @@ jobs:
             export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
             export TAG=$(echo $CIRCLE_SHA1 | cut -c 1-7)
             export REPOSITORY=$(cat /tmp/workspace/vars/image_repo_name)
-            ./src/service/push_image.sh "${ACCOUNT_ID}" "${AWS_DEFAULT_REGION}" "${REPOSITORY}" "${TAG}"
+            /src/service/push_image.sh "${ACCOUNT_ID}" "${AWS_DEFAULT_REGION}" "${REPOSITORY}" "${TAG}"
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
