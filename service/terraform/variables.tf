@@ -105,3 +105,7 @@ variable "health_check_timeout" {
   description = "The time period in seconds to wait for a health check to succeed before it is considered a failure"
   default     = 10
 }
+
+variable "ecs_cluster_state_bucket" {
+  description = "S3 bucket with the ecs cluster state file"
+}
