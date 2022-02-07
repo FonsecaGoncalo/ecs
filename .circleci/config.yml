@@ -53,6 +53,7 @@ jobs:
     steps:
       - run:
           command: echo "$(aws sts get-caller-identity --query Account --output text)" > account_id
+      - *persist_to_workspace
   ecs-cluster-terraform:
     working_directory: *workspace_root
     docker:
