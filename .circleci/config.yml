@@ -42,15 +42,12 @@ commands:
       - run:
           command: |
             cd << parameters.dir >>
-            terraform apply -auto-approve -var="<< parameters.vars >>"
-          when:
-            condition: << parameters.vars >>
-      - run:
-          command: |
-            cd << parameters.dir >>
-            terraform apply -auto-approve
-          unless:
-            condition: << parameters.vars >>
+            if [ -z "<< parameters.vars >>" ]
+            then
+              terraform apply -auto-approve
+            else
+              terraform apply -auto-approve -var="<< parameters.vars >>"
+            fi
   install-tar:
     steps:
       - run:
