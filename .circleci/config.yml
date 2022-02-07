@@ -94,7 +94,6 @@ jobs:
           name: ECS-Service terraform init & apply
           command: |
       - terraform-init:
-          account-id: $(cat account_id)
           dir: ./service/terraform
       - terraform-apply:
           dir: ./service/terraform
