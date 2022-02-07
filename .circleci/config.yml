@@ -47,7 +47,7 @@ commands:
             then
               terraform apply -auto-approve
             else
-              terraform apply -auto-approve -var="<< parameters.vars >>"
+              terraform apply -auto-approve << parameters.vars >>
             fi
   install-tar:
     steps:
@@ -129,7 +129,7 @@ jobs:
           dir: ./src/service/terraform
       - terraform-apply:
           dir: ./src/service/terraform
-          vars: service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
+          vars: -var="service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)" -var="$(cat /tmp/workspace/vars/account_id)-tfstate"
 workflows:
   version: 2
   build:
