@@ -87,6 +87,18 @@ jobs:
             terraform output image_repo_name > /tmp/workspace/vars/image_repo_name
             terraform output image_repo_url > /tmp/workspace/vars/image_repo_url
       - *persist_to_workspace
+  get-ecr-login:
+    working_directory: *workspace_root
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - install-tar
+      - *attach_workspace
+      - run:
+          name: build and push docker image
+          command: |
+            aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" > /tmp/workspace/vars/ecr_login
+      - *persist_to_workspace
   build-push-docker-image:
     working_directory: *workspace_root
     docker:
@@ -101,7 +113,10 @@ jobs:
             export TAG=$(echo $CIRCLE_SHA1 | cut -c 1-7)
             export REPOSITORY=$(cat /tmp/workspace/vars/image_repo_name)
             cd ./src/service
-            ./push_image.sh "${ACCOUNT_ID}" "${AWS_DEFAULT_REGION}" "${REPOSITORY}" "${TAG}"
+            cat /tmp/workspace/vars/ecr_login | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com
+            docker build --platform linux/amd64 -t "${REPOSITORY}" .
+            docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${AWS_DEFAULT_REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
+            docker push "${IMAGE_URL}"
       - *persist_to_workspace
   ecs-service-terraform:
     docker:
@@ -124,6 +139,9 @@ workflows:
       - ecs-cluster-terraform:
           requires:
             - get-aws-account
+      - get-ecr-login:
+          requires:
+            - ecs-cluster-terraform
       - build-push-docker-image:
           requires:
             - ecs-cluster-terraform
