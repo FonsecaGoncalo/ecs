@@ -95,7 +95,7 @@ jobs:
       - install-tar
       - *attach_workspace
       - run:
-          name: build and push docker image
+          name: Get ECR login
           command: |
             aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" > /tmp/workspace/vars/ecr_login
       - *persist_to_workspace
@@ -144,7 +144,7 @@ workflows:
             - ecs-cluster-terraform
       - build-push-docker-image:
           requires:
-            - ecs-cluster-terraform
+            - get-ecr-login
       - ecs-service-terraform:
           requires:
             - build-push-docker-image
