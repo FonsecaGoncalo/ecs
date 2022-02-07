@@ -15,3 +15,7 @@ output "image_repo_url" {
 output "image_repo_arn" {
   value = aws_ecr_repository.image_repo.arn
 }
+
+output "image_repo_name" {
+  value = var.image_repo_name
+}

@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 
-aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 433743481407.dkr.ecr.eu-west-3.amazonaws.com
+set -o errexit
+set -o nounset
+set -o pipefail
 
-docker build --platform linux/amd64 -t ecs-poc-service-repo .
+ACCOUNT_ID=$1
+REGION=$2
+REPOSITORY=$3
+IMAGE_TAG=$4
 
-docker tag ecs-poc-service-repo:latest 433743481407.dkr.ecr.eu-west-3.amazonaws.com/ecs-poc-service-repo:2
+aws ecr get-login-password --region "${REGION}" | docker login --username AWS --password-stdin "${ACCOUNT_ID}".dkr.ecr."${REGION}".amazonaws.com
 
-docker push 433743481407.dkr.ecr.eu-west-3.amazonaws.com/ecs-poc-service-repo:2
+docker build --platform linux/amd64 -t "${REPOSITORY}" .
+
+docker tag "${REPOSITORY}":latest "${ACCOUNT_ID}".dkr.ecr."${REGION}".amazonaws.com/"${REPOSITORY}":"${IMAGE_TAG}"
+
+docker push "${IMAGE_URL}"
