@@ -26,6 +26,7 @@ commands:
           name: Terraform Init
           command: |
             export ACCOUNT_ID=$(cat /tmp/workspace/vars/account_id)
+            pwd
             ls
             ls ./src
             ls ./src/service
@@ -134,7 +135,7 @@ jobs:
           vars: service_image_url=$(cat /tmp/workspace/vars/image_repo_url):$(echo $CIRCLE_SHA1 | cut -c 1-7)
 workflows:
   version: 2
-  plan_approve_apply:
+  build:
     jobs:
       - get-aws-account
       - ecs-cluster-terraform:
